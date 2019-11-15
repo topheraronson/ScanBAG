@@ -1,0 +1,138 @@
+﻿<Window x:Class="WpfApp1.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WpfApp1"
+        mc:Ignorable="d"
+        Title="Nessus Scan File Processor" Height="1641.463" Width="903.621">
+
+    <StackPanel>
+        <TabControl>
+            <TabItem x:Name="tabLoadFiles" Header="Load Scan Files">
+                <StackPanel Background="White">
+                    <Grid Margin="0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="3*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Select Files Below and then Click Process" FontWeight="Bold" TextAlignment="Center" FontSize="18" Background="White" Margin="10,10,10,10"></TextBlock>
+                        <Button Name="btnProcess" IsEnabled="False" Grid.Column="1" Content="Process" Margin="5,10,10,10" Click="Button_ProcessFiles_Click"/>
+                    </Grid>
+                    <TextBlock Text="File Path:" Margin="10.0"></TextBlock>
+                    <Grid Margin="0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="3*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBox Name="tbDirectory" IsReadOnly="False" Padding="2" BorderThickness="1" Grid.Column="0" Margin="10,0,5,10"/>
+                        <Button Name="btnDirectoryBrowse" Grid.Column="1" Content="Browse" Margin="5,0,10,10" Click="Button_Browse_SelectDirectory_Click"/>
+                    </Grid>
+                    <DataGrid AutoGenerateColumns="False" Name="dgIncludedScanFiles" CanUserAddRows="True" Margin="0,10,0,0" ItemsSource="{Binding Path=ScanFileCollection, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"  ScrollViewer.CanContentScroll="True" ScrollViewer.VerticalScrollBarVisibility="Auto"  ScrollViewer.HorizontalScrollBarVisibility="Auto" Height="900">
+                        <DataGrid.Resources>
+                            <Style BasedOn="{StaticResource {x:Type DataGridColumnHeader}}" TargetType="{x:Type DataGridColumnHeader}">
+                                <Setter Property="Background" Value="#8BBB2E" />
+                                <Setter Property="Foreground" Value="White"/>
+                            </Style>
+                        </DataGrid.Resources>
+
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Network" IsReadOnly="False" Binding="{Binding Path=ScanFileNetworkName}" Width="*"></DataGridTextColumn>
+                            <DataGridTextColumn Header="Scan File" IsReadOnly="True"  Binding="{Binding Path=ScanFileName}" Width="5*"></DataGridTextColumn>
+                            <DataGridTemplateColumn x:Name="dgcbcIncludedCheck" Header="Include?" IsReadOnly="False" Width="60">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <CheckBox IsChecked="{Binding Path=ScanFileIncluded, UpdateSourceTrigger=PropertyChanged}" />
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                    <!--<Button Content="Add new row" HorizontalAlignment="Left" Margin="0,10,0,0" VerticalAlignment="Top" Width="75" Click="Button_Click_1"/>-->
+
+                </StackPanel>
+            </TabItem>
+            <TabItem x:Name="tabReview" Header="Review Findings" IsEnabled="False">
+                <StackPanel Background="White">
+                    <Grid Margin="0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="3*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Select False Positives per Network" FontWeight="Bold" TextAlignment="Center" FontSize="18" Background="White" Margin="10,10,10,10"></TextBlock>
+                        <Button Name="btnCompleteReview" IsEnabled="True" Grid.Column="1" Content="Continue ->" Margin="5,10,10,10" Click="Button_CompleteReview_Click"/>
+                    </Grid>
+                    <DataGrid AutoGenerateColumns="False" Name="dgReviewBugs" CanUserAddRows="True" Margin="0,10,0,0" ItemsSource="{Binding Path=NetworkIssueCollection, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" ScrollViewer.CanContentScroll="True" ScrollViewer.VerticalScrollBarVisibility="Auto"  ScrollViewer.HorizontalScrollBarVisibility="Auto" Height="900">
+                        <DataGrid.Resources>
+                            <Style BasedOn="{StaticResource {x:Type DataGridColumnHeader}}" TargetType="{x:Type DataGridColumnHeader}">
+                                <Setter Property="Background" Value="#8BBB2E" />
+                                <Setter Property="Foreground" Value="White"/>
+                            </Style>
+                            <Style TargetType="DataGridRow" x:Key="myStyle">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Checked}" Value="False">
+                                        <Setter Property="Foreground" Value="Gray"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+
+                        </DataGrid.Resources>
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Network" IsReadOnly="True" Binding="{Binding Path=NetworkName}" Width="*"></DataGridTextColumn>
+                            <DataGridTextColumn Header="CVSS" IsReadOnly="True"  Binding="{Binding Path=CVSS}" Width="*"></DataGridTextColumn>
+                            <DataGridTextColumn Header="Title" IsReadOnly="True"  Binding="{Binding Path=FindingName}" Width="5*"></DataGridTextColumn>
+                            <DataGridTemplateColumn x:Name="dgcbcFalsePositiveCheck" Header="False+" IsReadOnly="False" Width="35">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <CheckBox  Click="FalsePosiviteClicked" IsChecked="{Binding Path=FalsePositive, UpdateSourceTrigger=PropertyChanged}" />
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+
+                            <!--<DataGridCheckBoxColumn x:Name="dgcbcFalsePositiveCheck" Header="False+" IsReadOnly="False" Binding="{Binding Path=FalsePositive, UpdateSourceTrigger=PropertyChanged}" Width="35"></DataGridCheckBoxColumn>-->
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </StackPanel>
+            </TabItem>
+            <TabItem x:Name="tabGenBugs" Header="GenerateBugs" IsEnabled="False">
+                <StackPanel Background="White">
+                    <Grid Margin="0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="3*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Select Output File and Click Generate" FontWeight="Bold" TextAlignment="Center" FontSize="18" Background="White" Margin="10,10,10,10"></TextBlock>
+                        <Button Name="btnGenerate" IsEnabled="False" Grid.Column="1" Content="Generate" Margin="5,10,10,10" Click="Button_Generate_Click"/>
+                    </Grid>
+                    <TextBlock Text="File:" Margin="10.0"></TextBlock>
+                    <Grid Margin="0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="3*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBox Name="tbFile" IsReadOnly="False" Padding="2" BorderThickness="1" Grid.Column="0" Margin="10,0,5,10"/>
+                        <Button Name="btnFileBrowse" Grid.Column="1" Content="Browse" Margin="5,0,10,10" Click="Button_Browse_SelectFile_Click"/>
+                    </Grid>
+                    <DataGrid AutoGenerateColumns="False" Name="dgBugs" CanUserAddRows="True" Margin="0,10,0,0" ItemsSource="{Binding Mode=OneTime}">
+                        <DataGrid.Resources>
+                            <Style BasedOn="{StaticResource {x:Type DataGridColumnHeader}}" TargetType="{x:Type DataGridColumnHeader}">
+                                <Setter Property="Background" Value="#8BBB2E" />
+                                <Setter Property="Foreground" Value="White"/>
+                            </Style>
+                        </DataGrid.Resources>
+
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="CVSS" IsReadOnly="True"  Binding="{Binding Path=CVSS_Score}" Width="*"></DataGridTextColumn>
+                            <DataGridTextColumn Header="Title" IsReadOnly="True"  Binding="{Binding Path=Title}" Width="5*"></DataGridTextColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+
+                </StackPanel>
+            </TabItem>
+            <TabItem Header="Statistics" IsEnabled="False">
+                <Grid Background="#FFE5E5E5"/>
+            </TabItem>
+        </TabControl>
+
+    </StackPanel>
+</Window>
